@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Renkai Store</title>
+
+<style>
+    /* ===== BASE ===== */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: white;
+        background: url('Latarb.jpg') center/cover no-repeat fixed;
+    }
+
+    .overlay {
+        position: fixed;
+        top:0; left:0; right:0; bottom:0;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: -1;
+    }
+
+    /* NAVBAR */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 25px;
+        background: rgba(0,0,0,0.4);
+        backdrop-filter: blur(3px);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .menu-icon {
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .title {
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        flex: 1;
+    }
+
+    /* MENU */
+    .menu {
+        display: none;
+        flex-direction: column;
+        background: rgba(0,0,0,0.65);
+        backdrop-filter: blur(4px);
+        position: absolute;
+        width: 100%;
+        top: 60px;
+        left: 0;
+        z-index: 999;
+    }
+
+    .menu a {
+        padding: 15px;
+        text-decoration: none;
+        color: white;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .menu a:hover {
+        background: rgba(255,255,255,0.12);
+    }
+
+    /* SEARCH */
+    .search-box {
+        margin: 20px auto;
+        width: 90%;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 10px;
+        font-size: 16px;
+        border-radius: 20px;
+        border: none;
+        outline: none;
+    }
+
+    /* ===== BANNER FADE (promo/event) ===== */
+    .banner-labels {
+        width: 90%;
+        margin: 15px auto 5px auto;
+        display: flex;
+        gap: 10px;
+    }
+
+    .label-item {
+        padding: 7px 14px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: 0.25s;
+    }
+
+    .label-item.active {
+        background: rgba(255,255,255,0.3);
+        opacity: 1;
+    }
+
+    .banner-container {
+        width: 90%;
+        margin: 10px auto 25px auto;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        height: 170px;
+    }
+
+    .banner-slide {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 0.9s ease;
+    }
+
+    .banner-slide.show {
+        opacity: 1;
+    }
+
+    .banner-dots {
+        position: absolute;
+        bottom: 8px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        z-index: 30;
+    }
+
+    .banner-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: white;
+        opacity: 0.35;
+    }
+
+    .banner-dot.active {
+        opacity: 1;
+    }
+
+    /* GAME ICONS */
+    .game-container {
+        width: 90%;
+        margin: 10px auto;
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        align-items: flex-start;
+    }
+
+    .game-item {
+        width: 30%;
+        min-width: 140px;
+        max-width: 220px;
+        text-align: center;
+        background: rgba(255,255,255,0.1);
+        padding: 12px;
+        border-radius: 12px;
+        backdrop-filter: blur(3px);
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .game-item:hover {
+        background: rgba(255,255,255,0.22);
+        transform: translateY(-6px);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    }
+
+    .game-icon {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        margin: auto;
+        margin-bottom: 10px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+    }
+
+    /* POPUP */
+    #popup {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.65);
+        backdrop-filter: blur(4px);
+        display: none;
+        z-index: 2000;
+        overflow:auto;
+    }
+
+    .popup-box {
+        width: 92%;
+        max-width: 720px;
+        margin: 60px auto;
+        background: rgba(0,0,0,0.75);
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .service-box {
+        background: rgba(255,255,255,0.18);
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    /* SECTION */
+    .section {
+        padding: 20px;
+        margin-top: 20px;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(3px);
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 12px;
+    }
+
+    /* TESTIMONI CAROUSEL */
+    .testi-wrap {
+        width: 90%;
+        margin: 20px auto;
+        position: relative;
+        overflow: visible;
+    }
+
+    .testi-track {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: transform 0.6s ease;
+    }
+
+    .testi-item {
+        border-radius: 12px;
+        background-size: cover;
+        background-position: center;
+        cursor: pointer;
+        transition: transform 0.45s ease, filter 0.45s ease, opacity 0.45s ease;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    }
+
+    .testi-item.center {
+        width: 56%;
+        height: 260px;
+        transform: scale(1);
+        opacity: 1;
+        filter: none;
+    }
+
+    .testi-item.side {
+        width: 22%;
+        height: 180px;
+        transform: scale(0.92);
+        filter: blur(2px) saturate(0.8);
+        opacity: 0.6;
+    }
+
+    .testi-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.45);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        z-index: 40;
+    }
+    .testi-arrow.left { left: 8px; }
+    .testi-arrow.right { right: 8px; }
+
+    .testi-popup {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 6000;
+    }
+    .testi-popup img {
+        max-width: 94%;
+        max-height: 90%;
+        border-radius: 12px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+
+    @media (max-width: 800px) {
+        .game-container { flex-direction: column; gap:12px; align-items: center; }
+        .game-item { width: 100%; max-width: 420px; }
+        .testi-item.center { width: 70%; height: 220px; }
+        .testi-item.side { display: none; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="menu-icon" id="menuBtn">&#9776;</div>
+    <div class="title">RENKAI STORE</div>
+</div>
+
+<!-- 🔊 AUDIO AUTOPLAY + AUTO-UNMUTE -->
+<audio id="bgm" src="musik.mp3" autoplay loop muted></audio>
+
+<!-- MENU DROPDOWN -->
+<div class="menu" id="menu">
+    <a href="#beranda">Beranda</a>
+    <a href="https://wa.me/6285735045229" target="_blank">Chat Admin</a>
+    <a href="#testimoni">Testimoni</a>
+    <a href="#tentang">Tentang Kami</a>
+</div>
+
+<!-- SEARCH -->
+<div class="search-box">
+    <input type="text" placeholder="Cari layanan...">
+</div>
+
+<!-- ===== BANNER PROMO ===== -->
+<div class="banner-labels">
+    <div class="label-item active" id="promoBtn">Banner Promo</div>
+    <div class="label-item" id="eventBtn">Banner Event</div>
+</div>
+
+<div class="banner-container" id="promoSlider">
+    <div class="banner-slide" data-index="0" style="background-image:url('banner1.jpg');"></div>
+    <div class="banner-slide" data-index="1" style="background-image:url('banner2.jpg');"></div>
+    <div class="banner-slide" data-index="2" style="background-image:url('banner3.jpg');"></div>
+
+    <div class="banner-dots" id="promoDots"></div>
+</div>
+
+<div class="banner-container" id="eventSlider" style="display:none; opacity:0;">
+    <div class="banner-slide" data-index="0" style="background-image:url('event1.jpg');"></div>
+    <div class="banner-slide" data-index="1" style="background-image:url('event2.jpg');"></div>
+    <div class="banner-slide" data-index="2" style="background-image:url('event3.jpg');"></div>
+
+    <div class="banner-dots" id="eventDots"></div>
+</div>
+
+<!-- GAMES -->
+<div class="game-container">
+    <div class="game-item" onclick="openPopup('genshin')">
+        <div class="game-icon" style="background-image:url('genshin.jpg');"></div>
+        Genshin Impact
+    </div>
+
+    <div class="game-item" onclick="openPopup('hsr')">
+        <div class="game-icon" style="background-image:url('hsr.jpg');"></div>
+        Honkai Star Rail
+    </div>
+
+    <div class="game-item" onclick="openPopup('coc')">
+        <div class="game-icon" style="background-image:url('coc.jpg');"></div>
+        Clash of Clans
+    </div>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+    <div class="popup-box">
+        <h3 id="popupTitle" style="text-align:center;">Pilih Layanan</h3>
+        <div id="popupServices"></div>
+
+        <button onclick="closePopup()" style="
+            width:100%;
+            padding:10px;
+            margin-top:15px;
+            border:none;
+            border-radius:10px;
+            background:red;
+            color:white;
+            cursor:pointer;
+        ">Tutup</button>
+    </div>
+</div>
+
+<!-- TESTIMONI -->
+<div class="section" id="testimoni">
+    <h3 style="text-align:center;">Testimoni Pelanggan</h3>
+
+    <div class="testi-wrap" id="testiWrap">
+        <div class="testi-arrow left" id="testiPrev">&#8249;</div>
+
+        <div class="testi-track" id="testiTrack">
+            <div class="testi-item side" style="background-image:url('testi1.jpg');" data-src="testi1.jpg"></div>
+            <div class="testi-item center" style="background-image:url('testi2.jpg');" data-src="testi2.jpg"></div>
+            <div class="testi-item side" style="background-image:url('testi3.jpg');" data-src="testi3.jpg"></div>
+        </div>
+
+        <div class="testi-arrow right" id="testiNext">&#8250;</div>
+    </div>
+</div>
+
+<div class="testi-popup" id="testiPopup">
+    <img id="testiPopupImg" src="" alt="Testimoni">
+</div>
+
+<!-- TENTANG -->
+<div class="section" id="tentang">
+    <h3>Tentang Kami</h3>
+    <p>Renkai Store — penyedia layanan joki game aman, cepat dan terpercaya.</p>
+</div>
+
+<!-- ===================== SCRIPT ====================== -->
+<script>
+    /* MENU */
+    const menuBtn = document.getElementById("menuBtn");
+    const menu = document.getElementById("menu");
+    menuBtn.addEventListener("click", () => {
+        menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    });
+
+    /* BANNER SLIDER */
+    function initFadeSlider(containerId, dotsId, interval=3000) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        const slides = Array.from(container.querySelectorAll('.banner-slide'));
+        const dotsContainer = document.getElementById(dotsId);
+
+        let idx = 0;
+        dotsContainer.innerHTML = '';
+
+        slides.forEach((s,i)=>{
+            const d = document.createElement('div');
+            d.className = 'banner-dot' + (i===0? ' active':'');
+            d.addEventListener('click', ()=> show(i));
+            dotsContainer.appendChild(d);
+        });
+
+        function show(i) {
+            slides.forEach((s,j)=> s.classList.toggle('show', j===i));
+            Array.from(dotsContainer.children).forEach((d,k)=> d.classList.toggle('active', k===i));
+            idx = i;
+        }
+
+        show(0);
+        const timer = setInterval(()=> show((idx+1)%slides.length), interval);
+        return { show, stop: ()=>clearInterval(timer) };
+    }
+
+    const promo = initFadeSlider('promoSlider','promoDots', 3500);
+    const event = initFadeSlider('eventSlider','eventDots', 3500);
+
+    const promoBtn = document.getElementById("promoBtn");
+    const eventBtn = document.getElementById("eventBtn");
+    const promoSlider = document.getElementById("promoSlider");
+    const eventSlider = document.getElementById("eventSlider");
+
+    promoBtn.onclick = () => {
+        promoBtn.classList.add("active");
+        eventBtn.classList.remove("active");
+        eventSlider.style.opacity = 0;
+        setTimeout(() => {
+            eventSlider.style.display = "none";
+            promoSlider.style.display = "block";
+            setTimeout(()=> promoSlider.style.opacity = 1, 20);
+        }, 300);
+    };
+
+    eventBtn.onclick = () => {
+        eventBtn.classList.add("active");
+        promoBtn.classList.remove("active");
+        promoSlider.style.opacity = 0;
+        setTimeout(() => {
+            promoSlider.style.display = "none";
+            eventSlider.style.display = "block";
+            setTimeout(()=> eventSlider.style.opacity = 1, 20);
+        }, 300);
+    };
+
+    /* DATA LAYANAN */
+    const services = {
+        genshin: [
+            { name: "Archon Quest", price: "25.000" },
+            { name: "Story Quest", price: "15.000" },
+            { name: "Spiral Abyss 36★", price: "40.000" },
+            { name: "Farm Arte & Resin", price: "10.000" }
+        ],
+        hsr: [
+            { name: "Trailblaze Mission", price: "20.000" },
+            { name: "Companion Mission", price: "12.000" },
+            { name: "Stamina Farming", price: "8.000" }
+        ],
+        coc: [
+            { name: "War Attack", price: "10.000" },
+            { name: "Joki Farm Sumber Daya", price: "15.000" },
+            { name: "Up Wall", price: "8.000" }
+        ]
+    };
+
+    function openPopup(game) {
+        const popup = document.getElementById("popup");
+        const popupServices = document.getElementById("popupServices");
+        const popupTitle = document.getElementById("popupTitle");
+
+        popup.style.display = "block";
+
+        if (game === "genshin") popupTitle.innerText = "Joki Genshin Impact";
+        if (game === "hsr") popupTitle.innerText = "Joki Honkai Star Rail";
+        if (game === "coc") popupTitle.innerText = "Joki Clash of Clans";
+
+        popupServices.innerHTML = "";
+
+        services[game].forEach((svc) => {
+            let box = document.createElement("div");
+            box.className = "service-box";
+
+            box.innerHTML = `
+                <b>${svc.name}</b><br>
+                Harga: Rp ${svc.price}<br>
+                <button style="
+                    margin-top:8px;
+                    padding:7px 10px;
+                    border:none;
+                    border-radius:8px;
+                    background:#28a745;
+                    color:white;
+                    cursor:pointer;
+                " onclick="orderWA('${popupTitle.innerText}','${svc.name}','${svc.price}')">
+                    Order
+                </button>
+            `;
+            popupServices.appendChild(box);
+        });
+    }
+
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+
+    function orderWA(game, service, price) {
+        const number = "6285735045229";
+        const text =
+`Halo kak, saya mau order joki:
+Game: ${game}
+Layanan: ${service}
+Harga: Rp ${price}
+
+Akun:
+UID / Username:
+Server:
+Login via:
+`;
+        const url = "https://wa.me/" + number + "?text=" + encodeURIComponent(text);
+        window.open(url, "_blank");
+    }
+
+    /* TESTI CAROUSEL */
+    (function(){
+        const track = document.getElementById('testiTrack');
+        if(!track) return;
+        let items = Array.from(track.querySelectorAll('.testi-item'));
+        if(items.length < 3) items = items;
+
+        let centerIndex = 1;
+
+        function render() {
+            items = Array.from(track.querySelectorAll('.testi-item'));
+            items.forEach(i => i.classList.remove('center','side'));
+            const len = items.length;
+            const prev = (centerIndex - 1 + len) % len;
+            const next = (centerIndex + 1) % len;
+
+            items[centerIndex].classList.add('center');
+            items[prev].classList.add('side');
+            items[next].classList.add('side');
+
+            const rest = [];
+            for(let i=0;i<len;i++){
+                if(i===prev||i===centerIndex||i===next) continue;
+                rest.push(items[i]);
+            }
+
+            track.innerHTML = '';
+            track.appendChild(items[prev]);
+            track.appendChild(items[centerIndex]);
+            track.appendChild(items[next]);
+            rest.forEach(n => track.appendChild(n));
+
+            items = Array.from(track.querySelectorAll('.testi-item'));
+        }
+
+        function nextCenter(){
+            centerIndex = (centerIndex + 1) % items.length;
+            render();
+        }
+
+        let testiTimer = setInterval(nextCenter, 3200);
+
+        const prevBtn = document.getElementById('testiPrev');
+        const nextBtn = document.getElementById('testiNext');
+
+        prevBtn.addEventListener('click', ()=>{
+            clearInterval(testiTimer);
+            centerIndex = (centerIndex - 1 + items.length) % items.length;
+            render();
+            testiTimer = setInterval(nextCenter, 3200);
+        });
+
+        nextBtn.addEventListener('click', ()=>{
+            clearInterval(testiTimer);
+            centerIndex = (centerIndex + 1) % items.length;
+            render();
+            testiTimer = setInterval(nextCenter, 3200);
+        });
+
+        const popup = document.getElementById('testiPopup');
+        const popupImg = document.getElementById('testiPopupImg');
+
+        track.addEventListener('click', (e)=>{
+            let el = e.target;
+            while(el && !el.classList.contains('testi-item')) el = el.parentElement;
+            if(!el) return;
+            const src = el.getAttribute('data-src') || '';
+            if(!src) return;
+            popupImg.src = src;
+            popup.style.display = 'flex';
+        });
+
+        popup.addEventListener('click', ()=> popup.style.display = 'none');
+
+        render();
+    })();
+
+    /* 🎵 AUDIO AUTO-UNMUTE */
+    (function(){
+        const bgm = document.getElementById('bgm');
+        if(bgm){
+            const p = bgm.play();
+            if(p && p.catch) p.catch(()=>{});
+        }
+
+        function tryUnmute() {
+            bgm.muted = false;
+            const playTry = bgm.play();
+            if(playTry && playTry.catch) playTry.catch(()=>{});
+            window.removeEventListener('click', tryUnmute);
+            window.removeEventListener('touchstart', tryUnmute);
+        }
+
+        window.addEventListener('click', tryUnmute, { once: true });
+        window.addEventListener('touchstart', tryUnmute, { once: true });
+    })();
+</script>
+
+</body>
+</html>
